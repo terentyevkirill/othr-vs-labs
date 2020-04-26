@@ -1,18 +1,20 @@
 package com.othr.vs;
 
+import java.util.Deque;
+import java.util.LinkedList;
+
 public class Garage {
     private int capacity;
-    private int occupiedPlaces = 0;
+    private Deque<Car> cars = new LinkedList<>();
     private final Object monitor = new Object();
 
     public Garage(int capacity) {
         this.capacity = capacity;
     }
 
-    public void driveIn() {
+    public void driveIn(Car car) {
         synchronized (monitor) {
-            // fachliche Sperrbedingung
-            while (occupiedPlaces == capacity) {
+            while (cars.size() == capacity) {
                 try {
                     System.out.println("    Warten an Schranke: " + Thread.currentThread().getName());
                     monitor.wait();
@@ -20,24 +22,23 @@ public class Garage {
                     e.printStackTrace();
                 }
             }
-            occupiedPlaces += 1;
+            cars.addLast(car);
             monitor.notifyAll();
         }
     }
 
-    public void driveOut() {
+    public Car driveOut() {
         synchronized (monitor) {
-            // fachliche Sperrbedingung
-            while (occupiedPlaces == 2) {
+            while (cars.isEmpty()) {
                 try {
-                    System.out.println("    Warten auf Ausfahrt: " + Thread.currentThread().getName());
                     monitor.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            occupiedPlaces -= 1;
-            monitor.notifyAll();   // nur EIN Auto ausfährt, d.h. kein notifyAll()
+            Car car = cars.removeFirst();
+            monitor.notifyAll();
+            return car;
         }
     }
 }

@@ -1,34 +1,35 @@
 package com.othr.vs;
 
-import java.util.Random;
-
-public class Car implements Runnable {
+public class Car {
     private String licencePlate;
-    private Garage garage;
+    private Color color;
 
-    public Car(String licencePlate, Garage garage) {
+    public Car(String licencePlate, Color color) {
         this.licencePlate = licencePlate;
-        this.garage = garage;
+        this.color = color;
+    }
+
+    public String getLicencePlate() {
+        return licencePlate;
+    }
+
+    public void setLicencePlate(String licencePlate) {
+        this.licencePlate = licencePlate;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     @Override
-    public void run() {
-        Random random = new Random();
-        while (true) {
-            try {
-                garage.driveIn();
-                System.out.println("Einfahrt: " + licencePlate);
-                long sleepTime = 1000 + random.nextInt(4000);
-                Thread.sleep(sleepTime);
-                garage.driveOut();
-                System.out.println("Ausfahrt: " + licencePlate);
-                sleepTime = 1000 + random.nextInt(4000);
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
+    public String toString() {
+        return "Car{" +
+                "licencePlate='" + licencePlate + '\'' +
+                ", color=" + color +
+                '}';
     }
-
 }
