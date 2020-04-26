@@ -10,7 +10,7 @@ public class Simulation {
             thread.start();
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(60000);
         System.out.println(Thread.currentThread().getName() + ": End of simulation");
 
     }

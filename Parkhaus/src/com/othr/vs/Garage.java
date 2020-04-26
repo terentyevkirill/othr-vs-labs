@@ -21,15 +21,23 @@ public class Garage {
                 }
             }
             occupiedPlaces += 1;
-            // in DIESEM Fall ist es nicht notwendig
-//            monitor.notify();
+            monitor.notifyAll();
         }
     }
 
     public void driveOut() {
         synchronized (monitor) {
+            // fachliche Sperrbedingung
+            while (occupiedPlaces == 2) {
+                try {
+                    System.out.println("    Warten auf Ausfahrt: " + Thread.currentThread().getName());
+                    monitor.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             occupiedPlaces -= 1;
-            monitor.notify();   // nur EIN Auto ausfährt, d.h. kein notifyAll()
+            monitor.notifyAll();   // nur EIN Auto ausfährt, d.h. kein notifyAll()
         }
     }
 }
