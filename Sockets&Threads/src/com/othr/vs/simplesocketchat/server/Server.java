@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public class Server {
     public static final String END_STRING = "Bye";
-    public static int PORT = 1212;
+    public static int PORT = 1213;  // 1213 for lab unit 4, 1212 for lab unit 3
     public static final String HOST = "im-lamport.oth-regensburg.de";   // only in OTH VPN
 
     public static void main(String[] args) {
