@@ -1,11 +1,13 @@
 package com.othr.vs.rmi.smarttv.server.entity;
 
-import java.io.Serializable;
+import com.othr.vs.rmi.smarttv.server.AufnahmewunschIF;
+
+import java.rmi.RemoteException;
 import java.util.Date;
 
 import static com.othr.vs.rmi.smarttv.server.entity.Codec.*;
 
-public class Aufnahmewunsch implements Serializable {
+public class Aufnahmewunsch implements AufnahmewunschIF {
     private Date start = new Date(), ende = new Date();
     private Codec codec = MPEG4;
 
@@ -18,7 +20,10 @@ public class Aufnahmewunsch implements Serializable {
     public Aufnahmewunsch() {
     }
 
-    public Date getStart() {
+
+    @Override
+    public Date getStart() throws RemoteException {
+        System.out.println("Aufgabewunsch: getStart() aufgerufen");
         return start;
     }
 
@@ -26,7 +31,9 @@ public class Aufnahmewunsch implements Serializable {
         this.start = start;
     }
 
-    public Date getEnde() {
+    @Override
+    public Date getEnde() throws RemoteException {
+        System.out.println("Aufgabewunsch: getEnde() aufgerufen");
         return ende;
     }
 
@@ -34,7 +41,9 @@ public class Aufnahmewunsch implements Serializable {
         this.ende = ende;
     }
 
-    public Codec getCodec() {
+    @Override
+    public Codec getCodec() throws RemoteException {
+        System.out.println("Aufgabewunsch: getCodec() aufgerufen");
         return codec;
     }
 
@@ -43,27 +52,8 @@ public class Aufnahmewunsch implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Aufnahmewunsch)) return false;
-
-        Aufnahmewunsch that = (Aufnahmewunsch) o;
-
-        if (getStart() != null ? !getStart().equals(that.getStart()) : that.getStart() != null) return false;
-        if (getEnde() != null ? !getEnde().equals(that.getEnde()) : that.getEnde() != null) return false;
-        return getCodec() == that.getCodec();
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getStart() != null ? getStart().hashCode() : 0;
-        result = 31 * result + (getEnde() != null ? getEnde().hashCode() : 0);
-        result = 31 * result + (getCodec() != null ? getCodec().hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
+    public String ausgabe() {
+        System.out.println("Aufgabewunsch: ausgabe() aufgerufen");
         return "Aufnahmewunsch{" +
                 "start=" + start +
                 ", ende=" + ende +

@@ -1,6 +1,5 @@
 package com.othr.vs.rmi.smarttv.server;
 
-import com.othr.vs.rmi.smarttv.server.entity.Aufnahmewunsch;
 import com.othr.vs.rmi.smarttv.server.entity.Sendung;
 
 import java.rmi.AlreadyBoundException;
@@ -32,8 +31,12 @@ public class TvController implements TvControllerIF {
     }
 
     @Override
-    public void registriereAufnahmewunsch(Aufnahmewunsch aufnahmewunsch) throws RemoteException {
-        System.out.println("TvController: Aufnahme von " + aufnahmewunsch.toString());
+    public void registriereAufnahmewunsch(AufnahmewunschIF aufnahmewunsch) throws RemoteException {
+        // call for testing -> on client side sout's are called
+        aufnahmewunsch.getStart();
+        aufnahmewunsch.getEnde();
+        aufnahmewunsch.getCodec();
+        System.out.println("TvController: Aufnahme von " + aufnahmewunsch.ausgabe());
     }
 
     @Override
