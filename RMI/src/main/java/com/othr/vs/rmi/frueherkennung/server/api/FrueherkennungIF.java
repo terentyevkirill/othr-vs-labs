@@ -1,7 +1,4 @@
-package com.othr.vs.rmi.frueherkennung.server;
-
-import com.othr.vs.rmi.frueherkennung.server.entity.Bericht;
-import com.othr.vs.rmi.frueherkennung.server.entity.Roentgenbild;
+package com.othr.vs.rmi.frueherkennung.server.api;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

@@ -1,6 +1,6 @@
 package com.othr.vs.rmi.frueherkennung.server.entity;
 
-import com.othr.vs.rmi.frueherkennung.server.BerichtIF;
+import com.othr.vs.rmi.frueherkennung.server.api.BerichtIF;
 
 import java.util.Date;
 
