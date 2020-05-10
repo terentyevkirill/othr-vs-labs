@@ -7,12 +7,12 @@ import java.rmi.RemoteException;
 
 public class FrueherkennungService implements FrueherkennungIF {
     @Override
-    public Bericht analysieren(Roentgenbild roentgenbilds) throws RemoteException {
-        System.out.println("Empfangen: " + roentgenbilds);
+    public void analysieren(Roentgenbild roentgenbild, CallbackIF referenz) throws RemoteException {
+        System.out.println("Empfangen: " + roentgenbild);
         Bericht antwort = new Bericht(
                 "Schnupfen",
                 "Eine Woche Bettruhe und VS-Videos");
         System.out.println("Sende: " + antwort);
-        return antwort;
+        referenz.setAntwort(antwort);
     }
 }
