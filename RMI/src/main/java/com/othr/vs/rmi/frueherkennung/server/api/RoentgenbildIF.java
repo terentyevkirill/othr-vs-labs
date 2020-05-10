@@ -1,4 +1,4 @@
-package com.othr.vs.rmi.frueherkennung.server;
+package com.othr.vs.rmi.frueherkennung.server.api;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

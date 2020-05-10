@@ -1,6 +1,6 @@
 package com.othr.vs.rmi.frueherkennung.server.entity;
 
-import com.othr.vs.rmi.frueherkennung.server.RoentgenbildIF;
+import com.othr.vs.rmi.frueherkennung.server.api.RoentgenbildIF;
 
 import java.rmi.RemoteException;
 import java.util.Date;
