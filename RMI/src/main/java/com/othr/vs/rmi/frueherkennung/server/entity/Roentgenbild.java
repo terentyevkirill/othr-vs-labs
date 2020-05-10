@@ -1,9 +1,11 @@
 package com.othr.vs.rmi.frueherkennung.server.entity;
 
-import java.io.Serializable;
+import com.othr.vs.rmi.frueherkennung.server.RoentgenbildIF;
+
+import java.rmi.RemoteException;
 import java.util.Date;
 
-public class Roentgenbild implements Serializable {
+public class Roentgenbild implements RoentgenbildIF {
     private Date aufnahmeVon;
     private transient String patientenName;
     private byte[] rawData;
@@ -18,6 +20,7 @@ public class Roentgenbild implements Serializable {
         this.rawData = "Some picture".getBytes();
     }
 
+    @Override
     public Date getAufnahmeVon() {
         return aufnahmeVon;
     }
@@ -34,12 +37,21 @@ public class Roentgenbild implements Serializable {
         this.patientenName = patientenName;
     }
 
+    @Override
     public byte[] getRawData() {
         return rawData;
     }
 
     public void setRawData(byte[] rawData) {
         this.rawData = rawData;
+    }
+
+    @Override
+    public String toPrint() throws RemoteException {
+        return "Roentgenbild{" +
+                "aufnahmeVon=" + aufnahmeVon +
+                ", rawData=" + rawData.length +
+                "bytes}";
     }
 
     @Override
