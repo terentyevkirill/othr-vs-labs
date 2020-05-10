@@ -1,4 +1,4 @@
-package com.othr.vs.rmi.frueherkennung.server.entity;
+package com.othr.vs.rmi.frueherkennung.server.api;
 
 import java.io.Serializable;
 import java.util.Date;

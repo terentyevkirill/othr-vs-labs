@@ -1,5 +1,8 @@
 package com.othr.vs.rmi.frueherkennung.server;
 
+import com.othr.vs.rmi.frueherkennung.server.api.FrueherkennungIF;
+import com.othr.vs.rmi.frueherkennung.server.impl.FrueherkennungService;
+
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

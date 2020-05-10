@@ -1,8 +1,8 @@
 package com.othr.vs.rmi.frueherkennung.client;
 
-import com.othr.vs.rmi.frueherkennung.server.FrueherkennungIF;
-import com.othr.vs.rmi.frueherkennung.server.entity.Bericht;
-import com.othr.vs.rmi.frueherkennung.server.entity.Roentgenbild;
+import com.othr.vs.rmi.frueherkennung.server.api.FrueherkennungIF;
+import com.othr.vs.rmi.frueherkennung.server.api.Bericht;
+import com.othr.vs.rmi.frueherkennung.server.api.Roentgenbild;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
