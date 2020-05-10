@@ -1,7 +1,7 @@
 package com.othr.vs.rmi.frueherkennung.client;
 
+import com.othr.vs.rmi.frueherkennung.server.BerichtIF;
 import com.othr.vs.rmi.frueherkennung.server.FrueherkennungIF;
-import com.othr.vs.rmi.frueherkennung.server.entity.Bericht;
 import com.othr.vs.rmi.frueherkennung.server.entity.Roentgenbild;
 
 import java.rmi.NotBoundException;
@@ -17,8 +17,8 @@ public class Client {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             FrueherkennungIF stub = (FrueherkennungIF) registry.lookup("FrueherkennungService");
             // eigentliche "remote"-Aufruf
-            Bericht bericht = stub.analysieren(roentgenbild);
-            System.out.println("Bericht empfangen: " + bericht);
+            BerichtIF bericht = stub.analysieren(roentgenbild);
+            System.out.println("Bericht empfangen: " + bericht.toPrint());
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
         }

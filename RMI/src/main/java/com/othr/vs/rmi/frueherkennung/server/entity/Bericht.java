@@ -1,9 +1,10 @@
 package com.othr.vs.rmi.frueherkennung.server.entity;
 
-import java.io.Serializable;
+import com.othr.vs.rmi.frueherkennung.server.BerichtIF;
+
 import java.util.Date;
 
-public class Bericht implements Serializable {
+public class Bericht implements BerichtIF {
     private Date datum;
     private String diagnose;
     private String weiteresVorgehen;
@@ -18,6 +19,7 @@ public class Bericht implements Serializable {
         this.datum = new Date();
     }
 
+    @Override
     public Date getDatum() {
         return datum;
     }
@@ -26,6 +28,7 @@ public class Bericht implements Serializable {
         this.datum = datum;
     }
 
+    @Override
     public String getDiagnose() {
         return diagnose;
     }
@@ -34,6 +37,7 @@ public class Bericht implements Serializable {
         this.diagnose = diagnose;
     }
 
+    @Override
     public String getWeiteresVorgehen() {
         return weiteresVorgehen;
     }
@@ -43,7 +47,7 @@ public class Bericht implements Serializable {
     }
 
     @Override
-    public String toString() {
+    public String toPrint() {
         return "Bericht{" +
                 "datum=" + datum +
                 ", diagnose='" + diagnose + '\'' +

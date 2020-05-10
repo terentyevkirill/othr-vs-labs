@@ -7,5 +7,5 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface FrueherkennungIF extends Remote {
-    Bericht analysieren(Roentgenbild roentgenbilds) throws RemoteException;
+    BerichtIF analysieren(Roentgenbild roentgenbilds) throws RemoteException;
 }
