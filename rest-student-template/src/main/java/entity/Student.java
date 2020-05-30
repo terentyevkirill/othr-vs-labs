@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.*;
 import java.util.Objects;
 
 @XmlRootElement     // <student>...
-@XmlAccessorType(XmlAccessType.FIELD) // bound fields to XML (.PROPERTY for binding get/set)
+@XmlAccessorType(XmlAccessType.PROPERTY) // bound fields to XML (.PROPERTY for binding get/set)
 public class Student {
 
     @XmlAttribute   // <student matrikelNr="1">...

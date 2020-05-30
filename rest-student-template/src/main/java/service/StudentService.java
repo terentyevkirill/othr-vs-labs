@@ -1,5 +1,6 @@
 package service;
 
+import app.OTHRestException;
 import entity.Student;
 
 import javax.ws.rs.*;
@@ -17,6 +18,8 @@ public class StudentService {
     private static int nextStudentId = 1;
     private static final Map<Integer, Student> studentDb = new HashMap<>();
 
+    //    @GET
+//    @Path("students")
     public Collection<Student> getAllStudents() {
         return studentDb.values();
     }
@@ -30,13 +33,18 @@ public class StudentService {
             @QueryParam("from") int fromStudentId,
             @QueryParam("to") int toStudentId) {
 
-        if (fromStudentId == 0 || toStudentId == 0)
+        if (fromStudentId == 0 && toStudentId == 0)
             return getAllStudents();
+        else if (toStudentId == 0 && fromStudentId > 0)
+            return getAllStudents()
+                    .stream()
+                    .filter(s -> s.getMatrikelNr() >= fromStudentId)
+                    .collect(Collectors.toSet());
         else
             return getAllStudents()
                     .stream()
                     .filter(s -> s.getMatrikelNr() >= fromStudentId && s.getMatrikelNr() <= toStudentId)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
     }
 
     @POST
@@ -53,14 +61,22 @@ public class StudentService {
     @Path("students/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student exmatriculate(@PathParam("id") int studentId) {
-        return studentDb.remove(studentId);
+        if (studentDb.containsKey(studentId)) {
+            return studentDb.remove(studentId);
+        } else {
+            throw new OTHRestException(404, "Student mit ID " + studentId + " ist nicht immatrikuliert");
+        }
     }
 
     @GET
     @Path("students/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student getStudentById(@PathParam("id") int studentId) {
-        return studentDb.get(studentId);
+        if (studentDb.containsKey(studentId)) {
+            return studentDb.get(studentId);
+        } else {
+            throw new OTHRestException(404, "Student mit ID " + studentId + " ist nicht immatrikuliert");
+        }
     }
 
     @PUT
@@ -68,9 +84,14 @@ public class StudentService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student updateStudentAccount(@PathParam("id") int studentId, Student newData) {
-        newData.setMatrikelNr(studentId);   // if user gives to id or gives wrong
-        studentDb.put(studentId, newData);  // old value
-        return studentDb.get(studentId);    // return updated value
+        if (studentDb.containsKey(studentId)) {
+            newData.setMatrikelNr(studentId);   // if user gives to id or gives wrong
+            studentDb.put(studentId, newData);  // old value
+            return studentDb.get(studentId);    // return updated value
+        } else {
+            throw new OTHRestException(404, "Student mit ID " + studentId + " ist nicht immatrikuliert");
+        }
+
     }
 
 
