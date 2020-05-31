@@ -8,15 +8,13 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Adresse {
     protected String strasse;
-    protected String plz;
     protected String ort;
 
     public Adresse() {
     }
 
-    public Adresse(String strasse, String plz, String ort) {
+    public Adresse(String strasse, String ort) {
         this.strasse = strasse;
-        this.plz = plz;
         this.ort = ort;
     }
 }

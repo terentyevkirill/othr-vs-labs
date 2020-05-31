@@ -1,10 +1,12 @@
 package service;
 
 import app.OTHRestException;
+import entity.Adresse;
 import entity.Student;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -72,11 +74,26 @@ public class StudentService {
     @Path("students/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student getStudentById(@PathParam("id") int studentId) {
-        if (studentDb.containsKey(studentId)) {
-            return studentDb.get(studentId);
-        } else {
-            throw new OTHRestException(404, "Student mit ID " + studentId + " ist nicht immatrikuliert");
+        try (Connection c = DriverManager.getConnection(
+                "jdbc:mysql://localhost/vs-08?useTimezone=true&serverTimezone=UTC", "root", "1234")) {
+            Statement stmt = c.createStatement();
+            String query = "SELECT * FROM Student WHERE matrikelNr = " + studentId;
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.first()) {
+                Student student = new Student();
+                student.setMatrikelNr(rs.getInt("matrikelnr"));
+                student.setVorname(rs.getString("vorname"));
+                student.setNachname(rs.getString("nachname"));
+                Adresse anshrift = new Adresse(rs.getString("strasse"), rs.getString("ort"));
+                student.setAnschrift(anshrift);
+                return student;
+            } else {
+                throw new OTHRestException(404, "Student mit ID " + studentId + " ist nicht immatrikuliert");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+        return null;
     }
 
     @PUT
@@ -91,8 +108,5 @@ public class StudentService {
         } else {
             throw new OTHRestException(404, "Student mit ID " + studentId + " ist nicht immatrikuliert");
         }
-
     }
-
-
 }
