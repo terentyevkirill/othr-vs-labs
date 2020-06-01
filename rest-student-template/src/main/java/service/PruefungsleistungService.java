@@ -12,13 +12,13 @@ import java.sql.*;
 
 @Path("pruefungsleistung")
 public class PruefungsleistungService {
-
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Pruefungsleistung ablegen(Pruefungsleistung pruefungsleistung) {
+    public Pruefungsleistung pruefungsleistungEintrag(Pruefungsleistung pruefungsleistung) {
+        // for mysql v8 add ?useTimezone=true&serverTimezone=UTC
         try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/vs-08?useTimezone=true&serverTimezone=UTC", "root", "1234")) {
+                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
             c.setAutoCommit(false);
             try {
                 String insertQuery = "INSERT INTO Pruefungsleistung (pruefungId, matrikelNr, versuch, note) VALUES (?, ?, ?, ?)";
@@ -49,7 +49,6 @@ public class PruefungsleistungService {
             } catch (Exception e) {
                 c.rollback();
             }
-
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

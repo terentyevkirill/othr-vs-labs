@@ -4,27 +4,29 @@ import javax.xml.bind.annotation.*;
 import java.util.Objects;
 
 @XmlRootElement     // <student>...
-@XmlAccessorType(XmlAccessType.PROPERTY) // bound fields to XML (.PROPERTY for binding get/set)
+@XmlAccessorType(XmlAccessType.FIELD) // bound fields to XML (.PROPERTY for binding get/set)
 public class Student {
 
     @XmlAttribute   // <student matrikelNr="1">...
     private int matrikelNr;
     private String vorname;
     private String nachname;
+    private int ects;
     private Adresse anschrift;
 
     // Default-Konstruktor zwingend notwendig
     public Student() {
     }
 
-    public Student(String vorname, String nachname, Adresse anschrift) {
+    public Student(String vorname, String nachname, int ects, Adresse anschrift) {
         this.vorname = vorname;
         this.nachname = nachname;
+        this.ects = ects;
         this.anschrift = anschrift;
     }
 
-    public Student(int matrikelNr, String vorname, String nachname, Adresse anschrift) {
-        this(vorname, nachname, anschrift);
+    public Student(int matrikelNr, String vorname, String nachname, int ects, Adresse anschrift) {
+        this(vorname, nachname, ects, anschrift);
         this.matrikelNr = matrikelNr;
     }
 
@@ -51,6 +53,14 @@ public class Student {
 
     public void setNachname(String nachname) {
         this.nachname = nachname;
+    }
+
+    public int getEcts() {
+        return ects;
+    }
+
+    public void setEcts(int ects) {
+        this.ects = ects;
     }
 
     public Adresse getAnschrift() {
