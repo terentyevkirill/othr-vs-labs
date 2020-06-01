@@ -3,6 +3,7 @@ package app;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.glassfish.jersey.server.ResourceConfig;
+import service.PruefungsleistungService;
 import service.StudentService;
 
 import javax.swing.*;
@@ -18,6 +19,7 @@ public class Server {
         // Register REST-resources (i.e. service classes) with the webserver
         config.register(ServerExceptionMapper.class);
         config.register(StudentService.class);
+        config.register(PruefungsleistungService.class);
         // add further REST-resources like this:
         // config.register(XyzService.class);
 
