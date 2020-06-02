@@ -38,12 +38,11 @@ public class StudentService {
             }
             return students;
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new OTHRestException(500, throwables.getMessage());
         }
-        return null;
     }
 
-//    @GET
+    //    @GET
 //    @Path("students")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Collection<Student> getStudentsByRange(
@@ -82,9 +81,8 @@ public class StudentService {
             stmt.executeUpdate();
             return s;
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new OTHRestException(500, throwables.getMessage());
         }
-        return null;
     }
 
     @DELETE
@@ -100,9 +98,8 @@ public class StudentService {
             stmt.executeUpdate();
             return s;
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new OTHRestException(500, throwables.getMessage());
         }
-        return null;
     }
 
     @GET
@@ -119,16 +116,18 @@ public class StudentService {
                 student.setMatrikelNr(rs.getInt("matrikelnr"));
                 student.setVorname(rs.getString("vorname"));
                 student.setNachname(rs.getString("nachname"));
-                Adresse anshrift = new Adresse(rs.getString("strasse"), rs.getString("ort"));
+                student.setEcts(rs.getInt("ects"));
+                Adresse anshrift = new Adresse(
+                        rs.getString("strasse"),
+                        rs.getString("ort"));
                 student.setAnschrift(anshrift);
                 return student;
             } else {
-                throw new OTHRestException(404, "Student mit ID " + matrikelNr + " ist nicht immatrikuliert");
+                throw new OTHRestException(404, "Student mit ID " + matrikelNr + " existiert nicht");
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new OTHRestException(500, throwables.getMessage());
         }
-        return null;
     }
 
     @PUT
@@ -150,8 +149,7 @@ public class StudentService {
             newData = getStudentById(matrikelNr);
             return newData;
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new OTHRestException(500, throwables.getMessage());
         }
-        return null;
     }
 }

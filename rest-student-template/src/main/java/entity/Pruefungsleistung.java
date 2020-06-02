@@ -4,21 +4,34 @@ import javax.xml.bind.annotation.*;
 import java.util.Objects;
 
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Pruefungsleistung {
-    private String pruefungId;
-    private int matrikelNr;
+    private int id;     // PK
+    private String pruefungId;  // FK
+    private int matrikelNr;     // FK
     private int versuch;
-    private float note;
+    private String note;
 
     public Pruefungsleistung() {
     }
 
-    public Pruefungsleistung(String pruefungId, int matrikelNr, int versuch, float note) {
+    public Pruefungsleistung(String pruefungId, int matrikelNr, int versuch, String note) {
         this.pruefungId = pruefungId;
         this.matrikelNr = matrikelNr;
         this.versuch = versuch;
         this.note = note;
+    }
+    public Pruefungsleistung(int id, String pruefungId, int matrikelNr, int versuch, String note) {
+        this(pruefungId, matrikelNr, versuch, note);
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPruefungId() {
@@ -45,11 +58,11 @@ public class Pruefungsleistung {
         this.versuch = versuch;
     }
 
-    public float getNote() {
+    public String getNote() {
         return note;
     }
 
-    public void setNote(float note) {
+    public void setNote(String note) {
         this.note = note;
     }
 

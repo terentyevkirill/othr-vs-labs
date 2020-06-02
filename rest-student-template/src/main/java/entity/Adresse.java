@@ -7,8 +7,8 @@ import java.util.Objects;
 // hat kein PK -> kein Entität, sondern ein Value-object -> kein @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Adresse {
-    protected String strasse;
-    protected String ort;
+    private String strasse;
+    private String ort;
 
     public Adresse() {
     }
