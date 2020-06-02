@@ -11,20 +11,22 @@ public class Student {
     private int matrikelNr;
     private String vorname;
     private String nachname;
+    private int ects;
     private Adresse anschrift;
 
     // Default-Konstruktor zwingend notwendig
     public Student() {
     }
 
-    public Student(String vorname, String nachname, Adresse anschrift) {
+    public Student(String vorname, String nachname, int ects, Adresse anschrift) {
         this.vorname = vorname;
         this.nachname = nachname;
+        this.ects = ects;
         this.anschrift = anschrift;
     }
 
-    public Student(int matrikelNr, String vorname, String nachname, Adresse anschrift) {
-        this(vorname, nachname, anschrift);
+    public Student(int matrikelNr, String vorname, String nachname, int ects, Adresse anschrift) {
+        this(vorname, nachname, ects, anschrift);
         this.matrikelNr = matrikelNr;
     }
 
@@ -51,6 +53,14 @@ public class Student {
 
     public void setNachname(String nachname) {
         this.nachname = nachname;
+    }
+
+    public int getEcts() {
+        return ects;
+    }
+
+    public void setEcts(int ects) {
+        this.ects = ects;
     }
 
     public Adresse getAnschrift() {
