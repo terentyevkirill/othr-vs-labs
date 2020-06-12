@@ -1,16 +1,16 @@
 package service;
 
 import app.OTHRestException;
-import entity.Adresse;
-import entity.Student;
+import de.othr.vs.xml.Adresse;
+import de.othr.vs.xml.Student;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.File;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static app.Server.*;
 
 @Path("studentaffairs")
 public class StudentService {
@@ -19,8 +19,7 @@ public class StudentService {
     @Path("students")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Student> getAllStudents() {
-        try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT * FROM Student";
             Statement stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery(query);
@@ -69,8 +68,7 @@ public class StudentService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student matriculate(Student s) {
-        try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "INSERT INTO Student (matrikelNr, vorname, nachname, ects, strasse, ort) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setInt(1, s.getMatrikelNr());
@@ -107,8 +105,7 @@ public class StudentService {
     @Path("students/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student getStudentById(@PathParam("id") int matrikelNr) {
-        try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             Statement stmt = c.createStatement();
             String query = "SELECT * FROM Student WHERE matrikelNr = " + matrikelNr;
             ResultSet rs = stmt.executeQuery(query);
@@ -136,8 +133,7 @@ public class StudentService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student updateStudentAccount(@PathParam("id") int matrikelNr, Student newData) {
-        try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "UPDATE Student SET vorname = ?, nachname = ?, ects = ?, strasse = ?, ort = ? WHERE matrikelNr = ?";
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setString(1, newData.getVorname());

@@ -1,13 +1,15 @@
 package service;
 
 import app.OTHRestException;
-import entity.Pruefungsleistung;
+import de.othr.vs.xml.Pruefungsleistung;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static app.Server.*;
 
 @Path("studentaffairs")
 public class PruefungsleistungService {
@@ -18,8 +20,7 @@ public class PruefungsleistungService {
     public Pruefungsleistung addExam(@PathParam("sid") int studentId, Pruefungsleistung pl) {
         pl.setMatrikelNr(studentId);
         // for mysql v8 add ?useTimezone=true&serverTimezone=UTC
-        try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             c.setAutoCommit(false);
             try {
                 // get ects-number from Pruefung table
@@ -40,7 +41,7 @@ public class PruefungsleistungService {
                         PreparedStatement stmt3 = c.prepareStatement(query3);
                         stmt3.setString(1, pl.getPruefungId());
                         stmt3.setInt(2, pl.getMatrikelNr());
-                        stmt3.setInt(3, pl.getVersuch());
+                        stmt3.setShort(3, pl.getVersuch());
                         stmt3.setString(4, pl.getNote());
                         if (stmt3.executeUpdate() == 1) {
                             // if exactly 1 row was inserted, commit changes and return object
@@ -71,8 +72,7 @@ public class PruefungsleistungService {
     @Path("students/{sid}/examresults")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Pruefungsleistung> getExamsByStudentId(@PathParam("sid") int studentId) {
-        try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://im-vm-011/vs-08", "vs-08", "vs-08-pw")) {
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT * FROM Pruefungsleistung WHERE matrikelNr = ?";
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setInt(1, studentId);
@@ -83,7 +83,7 @@ public class PruefungsleistungService {
                 p.setId(rs.getInt("id"));
                 p.setMatrikelNr(rs.getInt("matrikelNr"));
                 p.setPruefungId(rs.getString("pruefungId"));
-                p.setVersuch(rs.getInt("versuch"));
+                p.setVersuch(rs.getShort("versuch"));
                 p.setNote(rs.getString("note"));
                 pruefungsleistungen.add(p);
             }
