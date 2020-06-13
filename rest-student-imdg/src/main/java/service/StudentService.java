@@ -1,7 +1,9 @@
 package service;
 
 import app.OTHRestException;
+import com.hazelcast.core.IAtomicLong;
 import com.hazelcast.core.ReplicatedMap;
+import com.hazelcast.util.JsonUtil;
 import de.othr.vs.xml.Adresse;
 import de.othr.vs.xml.Student;
 
@@ -25,7 +27,7 @@ public class StudentService {
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT * FROM Student";
             Statement stmt = c.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery(query);
             Collection<Student> students = new ArrayList<>();
             while (rs.next()) {
                 Student s = new Student();
@@ -73,6 +75,15 @@ public class StudentService {
     public Student matriculate(Student s) {
         System.out.println("StudentService: matriculate()");
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
+            ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap("students");
+            IAtomicLong studentId = hazelcast.getAtomicLong("matrikel-nr-counter");
+            String getMaxMatrikelNrQuery = "SELECT MAX(matrikelNr) FROM Student";
+            Statement maxMatrNrStmt = c.createStatement();
+            ResultSet rs = maxMatrNrStmt.executeQuery(getMaxMatrikelNrQuery);
+            rs.first();
+            studentId.set(rs.getInt(1));
+            s.setMatrikelNr((int) studentId.incrementAndGet());
+
             String query = "INSERT INTO Student (matrikelNr, vorname, nachname, ects, strasse, ort) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setInt(1, s.getMatrikelNr());
@@ -85,7 +96,6 @@ public class StudentService {
             System.out.println("StudentService: insert student into MySQL: " + s);
 
             // zusätzlich in Hazelcast data grid hinzufügen (für 5 Minuten)
-            ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap("students");
             map.put(s.getMatrikelNr(), s, 5L, TimeUnit.MINUTES);
             System.out.println("StudentService: insert student into IMDG: " + s);
 
