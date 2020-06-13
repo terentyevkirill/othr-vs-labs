@@ -1,5 +1,6 @@
 package service;
 
+import app.Server;
 import de.othr.vs.xml.Veranstaltung;
 
 import java.util.List;

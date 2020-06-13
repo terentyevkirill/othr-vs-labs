@@ -35,7 +35,7 @@ public class Server {
         networkConfig.getInterfaces().setEnabled(true); // and set to "true"
         // For OTH Cip-Pools please set to 172.*.*.* ...
         // For your home network set to 192.168.*.* or 10.*.*.* or whatever is your local IP range
-        networkConfig.getInterfaces().setInterfaces(Arrays.asList("192.*.*.*"));
+        networkConfig.getInterfaces().setInterfaces(Arrays.asList("172.*.*.*"));
         JoinConfig joinConfig = networkConfig.getJoin();
         joinConfig.getMulticastConfig().setEnabled( true );
         joinConfig.getMulticastConfig().setMulticastGroup("224.2.2.3");

@@ -1,6 +1,7 @@
 package service;
 
 import app.OTHRestException;
+import com.hazelcast.core.ReplicatedMap;
 import de.othr.vs.xml.Adresse;
 import de.othr.vs.xml.Student;
 
@@ -8,6 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static app.Server.*;
@@ -19,10 +21,11 @@ public class StudentService {
     @Path("students")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Student> getAllStudents() {
+        System.out.println("StudentService: getAllStudents()");
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT * FROM Student";
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+        ResultSet rs = stmt.executeQuery(query);
             Collection<Student> students = new ArrayList<>();
             while (rs.next()) {
                 Student s = new Student();
@@ -68,6 +71,7 @@ public class StudentService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student matriculate(Student s) {
+        System.out.println("StudentService: matriculate()");
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "INSERT INTO Student (matrikelNr, vorname, nachname, ects, strasse, ort) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = c.prepareStatement(query);
@@ -78,6 +82,13 @@ public class StudentService {
             stmt.setString(5, s.getAnschrift().getStrasse());
             stmt.setString(6, s.getAnschrift().getOrt());
             stmt.executeUpdate();
+            System.out.println("StudentService: insert student into MySQL: " + s);
+
+            // zusätzlich in Hazelcast data grid hinzufügen (für 5 Minuten)
+            ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap("students");
+            map.put(s.getMatrikelNr(), s, 5L, TimeUnit.MINUTES);
+            System.out.println("StudentService: insert student into IMDG: " + s);
+
             return s;
         } catch (SQLException throwables) {
             throw new OTHRestException(500, throwables.getMessage());
@@ -105,21 +116,36 @@ public class StudentService {
     @Path("students/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Student getStudentById(@PathParam("id") int matrikelNr) {
+        Student s = null;
+        // zuerst aus Hazelcast data grid zu lesen versuchen
+        ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap("students");
+        s = map.get(matrikelNr);
+        if (s != null) {
+            System.out.println("StudentService: retrieve student from IMDG: " + s);
+            return s;
+        }
+
+        // falls nicht gefunden, schlagen in MySQL nach
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             Statement stmt = c.createStatement();
             String query = "SELECT * FROM Student WHERE matrikelNr = " + matrikelNr;
             ResultSet rs = stmt.executeQuery(query);
             if (rs.first()) {
-                Student student = new Student();
-                student.setMatrikelNr(rs.getInt("matrikelnr"));
-                student.setVorname(rs.getString("vorname"));
-                student.setNachname(rs.getString("nachname"));
-                student.setEcts(rs.getInt("ects"));
+                s = new Student();
+                s.setMatrikelNr(rs.getInt("matrikelnr"));
+                s.setVorname(rs.getString("vorname"));
+                s.setNachname(rs.getString("nachname"));
+                s.setEcts(rs.getInt("ects"));
                 Adresse anshrift = new Adresse(
                         rs.getString("strasse"),
                         rs.getString("ort"));
-                student.setAnschrift(anshrift);
-                return student;
+                s.setAnschrift(anshrift);
+                System.out.println("StudentService: retrieve student from MySQL: " + s);
+
+                // und speichern in IMDG
+                map.put(s.getMatrikelNr(), s, 5L, TimeUnit.MINUTES);
+                System.out.println("StudentService: insert student into IMDG: " + s);
+                return s;
             } else {
                 throw new OTHRestException(404, "Student mit ID " + matrikelNr + " existiert nicht");
             }
