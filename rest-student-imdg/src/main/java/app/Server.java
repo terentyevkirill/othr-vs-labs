@@ -23,6 +23,8 @@ public class Server {
     public static final String DB_CONNECTION = "jdbc:mysql://im-vm-011/vs-08";
     public static final String DB_USERNAME = "vs-08";
     public static final String DB_PASSWORD = "vs-08-pw";
+    public static final String VERANSTALTUNGEN_MAP_NAME = "veranstaltungen";
+    public static final String STUDENTS_MAP_NAME = "students";
 
     public static HazelcastInstance hazelcast;
 
@@ -35,7 +37,7 @@ public class Server {
         networkConfig.getInterfaces().setEnabled(true); // and set to "true"
         // For OTH Cip-Pools please set to 172.*.*.* ...
         // For your home network set to 192.168.*.* or 10.*.*.* or whatever is your local IP range
-        networkConfig.getInterfaces().setInterfaces(Arrays.asList("172.*.*.*"));
+        networkConfig.getInterfaces().setInterfaces(Arrays.asList("192.*.*.*"));
         JoinConfig joinConfig = networkConfig.getJoin();
         joinConfig.getMulticastConfig().setEnabled(true);
         joinConfig.getMulticastConfig().setMulticastGroup("224.2.2.3");

@@ -75,7 +75,7 @@ public class StudentService {
     public Student matriculate(Student s) {
         System.out.println("StudentService: matriculate()");
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
-            ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap("students");
+            ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap(STUDENTS_MAP_NAME);
             IAtomicLong studentId = hazelcast.getAtomicLong("matrikel-nr-counter");
             String getMaxMatrikelNrQuery = "SELECT MAX(matrikelNr) FROM Student";
             Statement maxMatrNrStmt = c.createStatement();
@@ -128,7 +128,7 @@ public class StudentService {
     public Student getStudentById(@PathParam("id") int matrikelNr) {
         Student s = null;
         // zuerst aus Hazelcast data grid zu lesen versuchen
-        ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap("students");
+        ReplicatedMap<Integer, Student> map = hazelcast.getReplicatedMap(STUDENTS_MAP_NAME);
         s = map.get(matrikelNr);
         if (s != null) {
             System.out.println("StudentService: retrieve student from IMDG: " + s);
