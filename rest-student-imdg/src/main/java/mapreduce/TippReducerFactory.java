@@ -1,4 +1,4 @@
-package app;
+package mapreduce;
 
 import com.hazelcast.mapreduce.Reducer;
 import com.hazelcast.mapreduce.ReducerFactory;
@@ -14,16 +14,18 @@ public class TippReducerFactory implements ReducerFactory<String, Veranstaltung,
     }
 
     private class TippReducer extends Reducer<Veranstaltung, List<Veranstaltung>> {
-        private volatile List<Veranstaltung> events = new ArrayList<>();
+        private volatile List<Veranstaltung> sammler = new ArrayList<>();
 
         @Override
         public void reduce(Veranstaltung veranstaltung) {
-            events.add(veranstaltung);
+            if (!sammler.contains(veranstaltung)) {
+                sammler.add(veranstaltung);
+            }
         }
 
         @Override
         public List<Veranstaltung> finalizeReduce() {
-            return events;
+            return sammler;
         }
     }
 

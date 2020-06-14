@@ -1,8 +1,9 @@
 package service;
 
-import app.TippCollator;
-import app.TippMapper;
-import app.TippReducerFactory;
+import app.OTHRestException;
+import mapreduce.TippCollator;
+import mapreduce.TippMapper;
+import mapreduce.TippReducerFactory;
 import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.*;
 import de.othr.vs.xml.Veranstaltung;
@@ -37,6 +38,9 @@ public class VeranstaltungService {
         // Hinzufügen der Veranstaltung in eine passende Hazelcast-In-Memory-Datenstruktur
         // Ressource-Pfad sollte sein: /restapi/events/
         // Zugriff auf Hazelcast-Node-Instanz über statisches Attribut der Klasse Server: Server.hazelcast
+        if (v == null || v.getTitel() == null || v.getBeschreibung() == null) {
+            throw new OTHRestException(402, "Event or its attributes are not specified");
+        }
         IMap<String, Veranstaltung> events = hazelcast.getMap(VERANSTALTUNGEN_MAP_NAME);
         events.put(v.getId(), v);
         return v.getId();
@@ -51,7 +55,11 @@ public class VeranstaltungService {
         // Ressource-Pfad sollte sein: /restapi/events/{veranstaltungs_id}
         // Zugriff auf Hazelcast-Node-Instanz über statisches Attribut der Klasse Server: Server.hazelcast
         IMap<String, Veranstaltung> events = hazelcast.getMap(VERANSTALTUNGEN_MAP_NAME);
-        return events.get(id);
+        Veranstaltung found = events.get(id);
+        if (found == null) {
+            throw new OTHRestException(404, "Event with id: " + id + " not found");
+        }
+        return found;
     }
 
 
@@ -59,7 +67,7 @@ public class VeranstaltungService {
     @GET
     @Path("/events")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Collection<Veranstaltung> getEventsByQuery(@QueryParam("search") String tippSuchwoerter) throws ExecutionException, InterruptedException {
+    public Collection<Veranstaltung> getEventsByQuery(@QueryParam("search") String tippSuchwoerter) {
         System.out.println("VeranstaltungService: getEventsByQuery()");
         if (tippSuchwoerter != null && !tippSuchwoerter.trim().isEmpty()) {
             String[] suchwoerter = tippSuchwoerter.trim().split(" ");
@@ -71,15 +79,18 @@ public class VeranstaltungService {
             // über Hazelcast-MapReduce-Algorithmus nach Veranstaltungen suchen,
             // die im Titel oder in der Beschreibung mind. eines der Suchwoerter enthalten
             IMap<String, Veranstaltung> map = hazelcast.getMap(VERANSTALTUNGEN_MAP_NAME);
-            KeyValueSource<String, Veranstaltung> source = KeyValueSource.fromMap(map);
-
             JobTracker jobTracker = hazelcast.getJobTracker("default");
+            KeyValueSource<String, Veranstaltung> source = KeyValueSource.fromMap(map);
             Job<String, Veranstaltung> job = jobTracker.newJob(source);
-            return job
+            JobCompletableFuture<List<Veranstaltung>> jobCompletableFuture = job
                     .mapper(new TippMapper(suchwoerter))
                     .reducer(new TippReducerFactory())
-                    .submit(new TippCollator())
-                    .get();
+                    .submit(new TippCollator());
+            try {
+                return jobCompletableFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new OTHRestException(500, "Internal server error");
+            }
         } else {
             return getAllEvents();
         }

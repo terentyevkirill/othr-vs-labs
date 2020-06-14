@@ -1,4 +1,4 @@
-package app;
+package mapreduce;
 
 import com.hazelcast.mapreduce.Collator;
 import de.othr.vs.xml.Veranstaltung;
@@ -10,6 +10,8 @@ public class TippCollator implements Collator<Map.Entry<String, List<Veranstaltu
     public List<Veranstaltung> collate(Iterable<Map.Entry<String, List<Veranstaltung>>> values) {
         Set<Veranstaltung> events = new HashSet<>();
         values.forEach(e -> events.addAll(e.getValue()));
-        return new ArrayList<>(events);
+        List<Veranstaltung> result = new ArrayList<>(events);
+        result.sort(Comparator.comparing(Veranstaltung::getStart));
+        return result;
     }
 }
