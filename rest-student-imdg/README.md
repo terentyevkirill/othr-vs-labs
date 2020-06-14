@@ -1,49 +1,56 @@
-# Verteilte Systeme: Im Memory Data Grid
+# Verteilte Systeme: Im Memory Data Grid und der MapReduce-Algorithmus
+##### [Hazelcast-Dokumatation](https://docs.hazelcast.org/docs/3.7.8/manual/html-single/)
 
-##Aufgabe 1: Distributed Datastructures mit In-Memory-Data-Grid „Hazelcast“
+##Aufgabe: MapReduce 
+Im neuen Package `de.othr.vs.xml` finden Sie auch die Klasse `Veranstaltung`. Diese
+repräsentiert eine Veranstaltung bzw. einen Veranstaltungstipp und sieht in etwa wie
+folgt aus:
+```java
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Veranstaltung implements Serializable {
+ private static final long serialVersionUID = 1L;
+ private String id;
+ private String titel;
+ private String beschreibung;
+ private Date start;
+ private Date ende;
+ private String owner;
+ // ...
+}
+```
+Erstellen Sie eine neue Klasse `VeranstaltungService`. Diese soll die REST-Schnittstelle
+für „POST“ und „GET“ für Veranstaltungen implementieren. Die Veranstaltung-Objekte
+sollen in einer IMap namens `"veranstaltungen"` im Hazelcast-Data-Grid gespeichert
+bzw. daraus gelesen werden.
+Die Resource-URI könnte wie folgt lauten: `/restapi/studentaffairs/events/{id}`
+Beispielaufrufe siehe Folgeseiten!
+Für eine Query von Veranstaltungen über Schlüsselwörter müssen nun alle „Nodes“ im
+Hazelcast-Cluster abgefragt werden, da die Veranstaltungsobjekte über alle Knoten
+verteilt gespeichert werden.
+Dabei sollen Veranstaltungen gefunden werden, deren Titel oder Beschreibung
+mindestens eines der übergebenen Suchworte enthalten. Das Ergebnis des Algorithmus
+ist eine `List<Veranstaltung>` mit allen Veranstaltungen, die zu den Suchwörtern
+passen.
+Die Resource-URI könnte wie folgt lauten:
+`/restapi/studentaffairs/events?search=Musik+Regensburg`
+Erstellen Sie hierzu folgende Klassen:
+![Klassen zu erstellen](img.png)
 
-Im vorherigen Übungsblatt nutzten Sie JDBC, um Daten zu Studierenden aus einer
-relationalen Datenbank auszulesen (innerhalb der Methode getStudentById).
-Für diese Übung wird davon ausgegangen, dass Student-Objekte sehr häufig gelesen
-und sehr selten verändert werden. Verfügbarkeit sei nun weit wichtiger als Konsistenz!
-Aus diesem Grund soll ein „In Memory Data Grid“ mit Hilfe des Frameworks „Hazelcast“
-zwischen allen Webservern (Ihren jeweiligen REST-Applikationen) im Netzwerk
-aufgebaut werden.
-Sie können für diese Übung den Lösungsvorschlag für die Übung 8 nutzen (siehe GRIPS)
-oder alternativ Ihr bestehendes Projekt weiternutzen. In diesem Fall nutzen Sie bitte den
-Lösungsvorschlag als Vorlage für die Konfigurationsdatei pom.xml (siehe <repository>
-neue <dependency>-Einträge) sowie die main-Methode der Klasse Server und passen
-Ihre Inhalte entsprechend den geänderten Details an.
+Die Klasse `TippMapper` benötigt zusätzlich noch folgenden Konstruktor zur Übergabe
+der Suchwörter: `public TippMapper(String[] suchwoerter)`
+Die Ergebnisliste kann (muss aber nicht) nach Relevanz sortiert werden. Es sollten
+grundsätzlich nur Veranstaltung berücksichtigt werden, die noch nicht abgeschlossen
+sind.
+Hinzufügen einer neuen Veranstaltung:
+![Hinzufügen einer neuen Veranstaltung](anfrage1.png)
 
-### Ihre Aufgaben:
-- Nur falls Sie Ihr bisheriges Projekt weiter nutzen:
-Verwenden Sie ab jetzt nicht mehr Ihre eigenen Klassen Student, Prüfungsleistung
-usw. sondern importieren und nutzen Sie die Klassen aus dem Package
-de.othr.vs.xml. Ersetzen Sie die import-Statements und passen Sie Ihren Code ggf.
-an.
-(Zur Erklärung: Mit dem In-Memory-Data-Grid wird Ihr CIP-Pool-Rechner und andere
-Rechner im Netzwerk jeweils als Node automatisch in ein gemeinsames Grid
-zusammengefügt. In diesem Grid werden Objekte ausgetauscht, so dass allen
-Objekten auf allen Nodes die selben Class-Dateien zugrunde liegen müssen.)
-- Machen Sie sich über die Website http://hazelcast.org mit dem Hazelcast IMDG
-vertraut, insbesondere mit den „Java Member Code Samples“, diese zeigen die
-wichtigsten Anwendungsfälle für das IMDG.
-- Wählen Sie eine passende Datenstruktur entsprechend der obigen „Code Samples“
-aus, nennen Sie diese Datenstruktur im Grid "students" (dieser Name ist wichtig,
-denn alle beteiligten Nodes verwenden denselben Namen).
-Hinweis: Gehen Sie davon aus, dass Objekte auf jeder Node schnellst möglich
-gefunden werden sollen.
-Sichern Sie in der neuen Datenstruktur neu erzeugte Student-Objekte nach Auslesen
-aus der MySQL-Datenbank zusätzlich darin.
-    - Diese Datenstruktur soll dieses Objekt für 5 Minuten vorhalten, anschließend
-gilt es als veraltet (vgl. „soft state“, dies wird in der put-Methode individuell
-angegeben) und soll nicht mehr darin enthalten sein.
-- Prüfen Sie beim Abrufen eines Student-Objekts nun, ob zur angeforderten
-Matrikelnummer bereits ein Objekt in der verteilten Datenstruktur vorliegt. Falls ja,
-geben Sie dieses zurück, eine Abfrage der Datenbank ist in diesem Fall nicht
-notwendig. Falls kein Objekt vorhanden ist, lesen Sie es aus der Datenbank aus und
-fügen Sie es der verteilten Datenstruktur hinzu.
-- Beim Erzeugen neuer Student-Objekte soll die nächste freie Matrikelnummer aus
-einer passenden Datenstruktur des Data-Grids gewählt werden (statt durch die
-Datenbank). Wählen Sie hierzu eine passende Datenstruktur aus, so dass die Vergabe
-der nächsten Matrikelnummer auch „thread-safe“ (im verteilten Sinne) ist.
+http://localhost:8080/restapi/studentaffairs/events/a11e5397-ec17-a9e2-ceb8e34b6362
+Abfragen der Details zu einer Veranstaltung (über dessen kryptische UUID):
+![Abfragen der Details zu einer Veranstaltung](anfrage2.png)
+
+Start einer MapReduce-Anfrage für Veranstaltungstipps zu den Suchwörtern Musik und
+Regensburg:
+http://localhost:8080/restapi/studentaffairs/events?search=Musik+Regensburg
+![MapReduce-Anfrage für Veranstaltungstipps zu den Suchwörtern Musik und
+  Regensburg](anfrage3.png)
