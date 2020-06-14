@@ -3,10 +3,14 @@ package service;
 import app.Server;
 import de.othr.vs.xml.Veranstaltung;
 
+import javax.ws.rs.*;
 import java.util.List;
 
+@Path("studentaffairs")
 public class VeranstaltungService {
 
+    @POST
+    @Path("/events")
     public String addEvent(Veranstaltung v) {
 
         // TODO: Hinzufügen der Veranstaltung in eine passende Hazelcast-In-Memory-Datenstruktur
@@ -17,8 +21,9 @@ public class VeranstaltungService {
 
     }
 
-
-    public Veranstaltung getEvent(String id) {
+    @GET
+    @Path("/events/{id}")
+    public Veranstaltung getEvent(@PathParam("id") String id) {
 
         // TODO: Auslesen einer Veranstaltung aus der Hazelcast-In-Memory-Datenstruktur
         // Ressource-Pfad sollte sein: /restapi/events/{veranstaltungs_id}
@@ -30,13 +35,14 @@ public class VeranstaltungService {
 
 
     //Beispielpfad: restapi/events?search=Regensburg+Party+Studierendenheim
-    public List<Veranstaltung> getEventsByQuery(String tippSuchwoerter) {
+    @GET
+    @Path("/events")
+    public List<Veranstaltung> getEventsByQuery(@QueryParam("search") String tippSuchwoerter) {
 
         // TODO: Vorbereiten der Methode und Rückgabe einer oder mehrerer Dummy-Veranstaltung(en)
         // Diese Methode wird in einer späteren Übung mit Hilfe einer Map-Reduce-Abfrage entsprechende Veranstaltungen suchen
         // Beispielhafter Ressource-Pfad: /restapi/veranstaltungen?search=Regensburg+Party+Studierendenheim
         // Zugriff auf Hazelcast-Node-Instanz über statisches Attribut der Klasse Server: Server.hazelcast
-
 
 
         // über Hazelcast-MapReduce-Algorithmus nach Veranstaltungen suchen,
