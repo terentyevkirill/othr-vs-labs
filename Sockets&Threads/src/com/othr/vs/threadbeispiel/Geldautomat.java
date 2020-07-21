@@ -2,7 +2,7 @@ package com.othr.vs.threadbeispiel;
 
 import java.util.Random;
 
-public class Geldautomat implements Runnable {
+public class Geldautomat extends Thread {
     private String standort;
     private Konto konto;
 
@@ -10,7 +10,6 @@ public class Geldautomat implements Runnable {
         this.standort = standort;
         this.konto = konto;
     }
-
 
     @Override
     public void run() {
