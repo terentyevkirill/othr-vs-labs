@@ -1,35 +1,42 @@
 package com.othr.vs.threadbeispiel;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Konto {
     private int kontostand;
-    private final Object monitor = new Object();
+    private final Lock lock = new ReentrantLock();
+    private final Condition einzahler = lock.newCondition();
+    private final Condition abheber = lock.newCondition();
 
     public void einzahlen(int betrag) {
-        synchronized (monitor) {
-            this.kontostand = this.kontostand + betrag;
-        }
+        lock.lock();
+        this.kontostand = this.kontostand + betrag;
+        lock.unlock();
     }
 
     public void auszahlen(int betrag) {
-        synchronized (monitor) {
+        lock.lock();
+        try {
             while (this.kontostand < betrag) {
-                try {
-                    monitor.wait();
-                } catch (InterruptedException e) {
-                    // ignore
-                }
+                abheber.awaitUninterruptibly();
             }
             this.kontostand = this.kontostand - betrag;
-            // Sobald mindestens eine der beiden nachfolgenden Bedingungen erfüllt ist, muss notifyAll verwendet werden:
-            // 1. Unterschiedliche Wartebedingungen (einzahlen und auszahlen)
-            // 2. Potentielles Weiterlaufen mehrerer Threads
-            monitor.notifyAll();
+        } finally {
+            lock.unlock();
         }
+
     }
 
     public int getKontostand() {
-        synchronized (monitor) {
-            return kontostand;
+        lock.lock();
+        int result;
+        try {
+            result = this.kontostand;
+            return result;
+        } finally {
+            lock.unlock();
         }
     }
 }
