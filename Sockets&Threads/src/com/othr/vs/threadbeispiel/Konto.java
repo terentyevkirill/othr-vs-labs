@@ -20,6 +20,9 @@ public class Konto {
                 }
             }
             this.kontostand = this.kontostand - betrag;
+            // Sobald mindestens eine der beiden nachfolgenden Bedingungen erfüllt ist, muss notifyAll verwendet werden:
+            // 1. Unterschiedliche Wartebedingungen (einzahlen und auszahlen)
+            // 2. Potentielles Weiterlaufen mehrerer Threads
             monitor.notifyAll();
         }
     }
