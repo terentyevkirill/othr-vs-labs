@@ -3,9 +3,9 @@ package cafeteria;
 import java.util.Random;
 
 public class Student implements Runnable {
-    private KitchenCounter bar;
-    public Student(KitchenCounter bar) {
-        this.bar = bar;
+    private KitchenCounter theke;
+    public Student(KitchenCounter theke) {
+        this.theke = theke;
     }
 
     @Override
@@ -13,12 +13,12 @@ public class Student implements Runnable {
         Random rnd = new Random();
         while(true) {
             try {
-                long eatingTime = rnd.nextInt(4000);
+                long eatingTime = 1000 + rnd.nextInt(4000);
                 Thread.sleep(eatingTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            bar.take();
+            theke.take();
         }
     }
 }
