@@ -11,6 +11,7 @@ public class Client {
 
     public static void main(String[] args) {
         try {
+            // do not pack in try with resources, otherwise socket is closed when used in runnables !
             Socket server = new Socket(Server.HOST, Server.PORT);
             Runnable keyboardListener = new KeyboardListener(server);
             Runnable inputStreamListener = new InputStreamListener(server);

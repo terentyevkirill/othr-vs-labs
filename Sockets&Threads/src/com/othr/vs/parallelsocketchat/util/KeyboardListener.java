@@ -18,8 +18,7 @@ public class KeyboardListener implements Runnable {
     @Override
     public void run() {
         // listen to the keyboard, send in socket
-        try {
-            OutputStream out = socket.getOutputStream();
+        try (OutputStream out = socket.getOutputStream()) {
             PrintWriter writer = new PrintWriter(out);
 
             Scanner scanner = new Scanner(System.in);
@@ -32,8 +31,6 @@ public class KeyboardListener implements Runnable {
             } while (input != null && !input.equalsIgnoreCase(Server.END_STRING));
 
             writer.close();
-            out.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
