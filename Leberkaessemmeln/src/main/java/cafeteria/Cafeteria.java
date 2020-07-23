@@ -8,6 +8,5 @@ public class Cafeteria {
         for (int i = 1; i <= 8; i++) {
             new Thread(new Student(theke)).start();
         }
-
     }
 }
