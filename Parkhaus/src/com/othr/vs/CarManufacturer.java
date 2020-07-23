@@ -15,12 +15,13 @@ public class CarManufacturer implements Runnable {
         Random rnd = new Random();
         while (true) {
             try {
-                long manufacturingTime = rnd.nextInt(2000);
+                long manufacturingTime = rnd.nextInt(1000);
                 Thread.sleep(manufacturingTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             Car newCar = new Car("R-HF " + carCounter++, Color.values()[rnd.nextInt(Color.values().length)]);
+            System.out.println("Hergestellt: " + newCar.toString());
             garage.driveIn(newCar);
             // After manufacturing
         }

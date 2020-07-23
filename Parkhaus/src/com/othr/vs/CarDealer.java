@@ -13,14 +13,14 @@ public class CarDealer implements Runnable {
     public void run() {
         Random rnd = new Random();
         while (true) {
-            long saleTime = rnd.nextInt(5000);
+            long saleTime = rnd.nextInt(7000);
             try {
                 Thread.sleep(saleTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             Car soldCar = garage.driveOut();
-            System.out.println("New sale: " + soldCar.toString());
+            System.out.println("New sale: " + soldCar.toString() + "\n");
         }
     }
 }
