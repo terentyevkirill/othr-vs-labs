@@ -1,7 +1,7 @@
-package com.othr.vs.simplesocketchat.server;
+package com.othr.vs.parallelsocketchat.server;
 
-import com.othr.vs.simplesocketchat.util.InputStreamListener;
-import com.othr.vs.simplesocketchat.util.KeyboardListener;
+import com.othr.vs.parallelsocketchat.util.InputStreamListener;
+import com.othr.vs.parallelsocketchat.util.KeyboardListener;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,7 +11,8 @@ import java.net.Socket;
 public class Server {
     public static final String END_STRING = "Bye";
     public static int PORT = 1212;
-    public static final String HOST = "im-lamport.oth-regensburg.de";   // only in OTH VPN
+//    public static final String HOST = "im-lamport.oth-regensburg.de";
+    public static final String HOST = "localhost";
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {

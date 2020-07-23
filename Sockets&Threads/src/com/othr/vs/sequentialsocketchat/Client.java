@@ -1,4 +1,4 @@
-package com.othr.vs.simplesockets;
+package com.othr.vs.sequentialsocketchat;
 
 import java.io.*;
 import java.net.Socket;

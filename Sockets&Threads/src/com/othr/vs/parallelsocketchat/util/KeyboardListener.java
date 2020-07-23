@@ -1,6 +1,6 @@
-package com.othr.vs.simplesocketchat.util;
+package com.othr.vs.parallelsocketchat.util;
 
-import com.othr.vs.simplesocketchat.server.Server;
+import com.othr.vs.parallelsocketchat.server.Server;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class KeyboardListener implements Runnable {
-    private Socket socket;
+    private final Socket socket;
 
     public KeyboardListener(Socket socket) {
         this.socket = socket;
@@ -32,6 +32,7 @@ public class KeyboardListener implements Runnable {
             } while (input != null && !input.equalsIgnoreCase(Server.END_STRING));
 
             writer.close();
+            out.close();
 
         } catch (IOException e) {
             e.printStackTrace();
