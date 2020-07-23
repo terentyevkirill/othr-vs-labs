@@ -16,13 +16,14 @@ public class Garage {
         synchronized (monitor) {
             while (cars.size() == capacity) {
                 try {
-                    System.out.println("    Warten an Schranke: " + Thread.currentThread().getName());
+                    System.out.println("    Warten an Schranke: " + car.toString());
                     monitor.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
             cars.addLast(car);
+            System.out.println("Einfahrt: " + car.toString());
             monitor.notifyAll();
         }
     }
@@ -37,6 +38,7 @@ public class Garage {
                 }
             }
             Car car = cars.removeFirst();
+            System.out.println("Ausfahrt: " + car.toString());
             monitor.notifyAll();
             return car;
         }
