@@ -2,7 +2,6 @@ package com.othr.vs.threadpoolwebserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -10,20 +9,18 @@ import java.util.List;
 
 // active class
 public class RequestHandler implements Runnable {
-    private final Socket clientRequest;
+    private final Socket clientSocket;
 
-    public RequestHandler(Socket clientRequest) {
-        this.clientRequest = clientRequest;
+    public RequestHandler(Socket clientSocket) {
+        this.clientSocket = clientSocket;
     }
 
     @Override
     public void run() {
         PrintWriter writer = null;
-        try {
+        try (InputStream in = clientSocket.getInputStream(); OutputStream out = clientSocket.getOutputStream()) {
             // create reader & writer
-            InputStream in = clientRequest.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            OutputStream out = clientRequest.getOutputStream();
             writer = new PrintWriter(out);
 
             // read & parse request
@@ -42,7 +39,8 @@ public class RequestHandler implements Runnable {
             writer.println();       // delimiter
             contentLines.forEach(writer::println);
             writer.flush();         // send now
-            clientRequest.close();  // close
+            writer.close();
+            clientSocket.close();  // close
         } catch (NoSuchFileException ex) {
             writer.println("HTTP/1.1 404 Not found");
             writer.println("Content-Type: text/html");

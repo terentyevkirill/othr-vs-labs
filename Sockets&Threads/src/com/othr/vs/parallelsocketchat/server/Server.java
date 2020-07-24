@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public class Server {
     public static final String END_STRING = "Bye";
-    public static int PORT = 1212;
+    public static int PORT = 8080;
 //    public static final String HOST = "im-lamport.oth-regensburg.de";
     public static final String HOST = "localhost";
 

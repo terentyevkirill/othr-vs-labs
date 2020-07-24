@@ -27,17 +27,16 @@ public class WebServer {
         try {
             // wait for new browser connection...
             ServerSocket serverSocket = new ServerSocket(port);
-            System.out.println("ServerSocket started...");
+            System.out.println("Server started...");
             while (true) {
-                Socket clientRequest = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
                 System.out.println("New request from "
-                        + clientRequest.getInetAddress().getHostAddress());
+                        + clientSocket.getInetAddress().getHostAddress());
 
                 // ... as soon as new connection performed,
                 // create Runnable and pass to ThreadPool
-                Runnable requestHandler = new RequestHandler(clientRequest);
+                Runnable requestHandler = new RequestHandler(clientSocket);
                 threadPool.execute(requestHandler);
-
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Client {
     public static void main(String[] args) {
         String serverHost = "localhost";
-        int serverPort = 1200;
+        int serverPort = 8080;
         System.out.print("Enter text: ");
         Scanner scanner = new Scanner(System.in);
         String request = scanner.nextLine();
