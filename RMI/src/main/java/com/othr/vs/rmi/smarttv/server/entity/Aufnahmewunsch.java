@@ -52,8 +52,8 @@ public class Aufnahmewunsch implements AufnahmewunschIF {
     }
 
     @Override
-    public String ausgabe() {
-        System.out.println("Aufgabewunsch: ausgabe() aufgerufen");
+    public String toPrint() {
+        System.out.println("Aufgabewunsch: toPrint() aufgerufen");
         return "Aufnahmewunsch{" +
                 "start=" + start +
                 ", ende=" + ende +

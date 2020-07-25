@@ -19,5 +19,5 @@ public interface AufnahmewunschIF extends Remote {
 
     // use ausgabe instead of toString(), bc we cannot override
     // with it throwing an Exception
-    String ausgabe() throws RemoteException;
+    String toPrint() throws RemoteException;
 }
