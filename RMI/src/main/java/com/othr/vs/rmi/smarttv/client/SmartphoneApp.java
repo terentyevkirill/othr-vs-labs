@@ -1,6 +1,7 @@
 package com.othr.vs.rmi.smarttv.client;
 
 import com.othr.vs.rmi.smarttv.server.AufnahmewunschIF;
+import com.othr.vs.rmi.smarttv.server.SendungIF;
 import com.othr.vs.rmi.smarttv.server.TvControllerIF;
 import com.othr.vs.rmi.smarttv.server.entity.Aufnahmewunsch;
 
@@ -19,8 +20,13 @@ public class SmartphoneApp {
             Aufnahmewunsch wunsch = new Aufnahmewunsch();
             AufnahmewunschIF wunschStub = (AufnahmewunschIF) UnicastRemoteObject.exportObject(wunsch, 0);
             stub.registriereAufnahmewunsch(wunschStub);
-            System.out.println("App: " + stub.getAktuelleSendung());
             stub.wechsleKanal(3);
+            SendungIF sendung = stub.getAktuelleSendung();
+            sendung.getTitel();
+            sendung.getBeschreibung();
+            sendung.getStart();
+            sendung.getEnde();
+            System.out.println("SmartphoneApp aktuelle Sendung: " + sendung.toPrint());
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
         }

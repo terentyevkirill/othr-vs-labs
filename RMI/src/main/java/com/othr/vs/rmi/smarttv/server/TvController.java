@@ -25,9 +25,10 @@ public class TvController implements TvControllerIF {
     }
 
     @Override
-    public Sendung getAktuelleSendung() throws RemoteException {
+    public SendungIF getAktuelleSendung() throws RemoteException {
         System.out.println("TvController: sende aktuelle Sendung");
-        return new Sendung("Tatort", "einer stirbt, zwei ermittelt");
+        Sendung sendung = new Sendung("Tatort", "einer stirbt, zwei ermittelt");
+        return (SendungIF) UnicastRemoteObject.exportObject(sendung, 0);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class TvController implements TvControllerIF {
         aufnahmewunsch.getStart();
         aufnahmewunsch.getEnde();
         aufnahmewunsch.getCodec();
-        System.out.println("TvController: Aufnahme von " + aufnahmewunsch.ausgabe());
+        System.out.println("TvController: Aufnahme von " + aufnahmewunsch.toPrint());
     }
 
     @Override

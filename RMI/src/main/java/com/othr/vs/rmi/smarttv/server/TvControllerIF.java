@@ -6,7 +6,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface TvControllerIF extends Remote {
-    Sendung getAktuelleSendung() throws RemoteException;
+    SendungIF getAktuelleSendung() throws RemoteException;
 
     void registriereAufnahmewunsch(AufnahmewunschIF aufnahmewunsch) throws RemoteException;
 

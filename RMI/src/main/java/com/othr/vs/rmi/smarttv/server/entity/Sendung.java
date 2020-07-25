@@ -1,9 +1,11 @@
 package com.othr.vs.rmi.smarttv.server.entity;
 
-import java.io.Serializable;
+import com.othr.vs.rmi.smarttv.server.SendungIF;
+
+import java.rmi.RemoteException;
 import java.util.Date;
 
-public class Sendung implements Serializable {
+public class Sendung implements SendungIF {
     private String titel;
     private String beschreibung;
     private Date start = new Date(), ende = new Date();
@@ -16,7 +18,9 @@ public class Sendung implements Serializable {
     public Sendung() {
     }
 
-    public String getTitel() {
+    @Override
+    public String getTitel() throws RemoteException {
+        System.out.println("Sendung: getTitel() aufgerufen");
         return titel;
     }
 
@@ -24,7 +28,9 @@ public class Sendung implements Serializable {
         this.titel = titel;
     }
 
-    public String getBeschreibung() {
+    @Override
+    public String getBeschreibung() throws RemoteException {
+        System.out.println("Sendung: getBeschreibung() aufgerufen");
         return beschreibung;
     }
 
@@ -32,7 +38,9 @@ public class Sendung implements Serializable {
         this.beschreibung = beschreibung;
     }
 
-    public Date getStart() {
+    @Override
+    public Date getStart() throws RemoteException {
+        System.out.println("Sendung: getStart() aufgerufen");
         return start;
     }
 
@@ -40,8 +48,21 @@ public class Sendung implements Serializable {
         this.start = start;
     }
 
-    public Date getEnde() {
+    @Override
+    public Date getEnde() throws RemoteException {
+        System.out.println("Sendung: getEnde() aufgerufen");
         return ende;
+    }
+
+    @Override
+    public String toPrint() throws RemoteException {
+        System.out.println("Sendung: toPrint() aufgerufen");
+        return "Sendung{" +
+                "titel='" + titel + '\'' +
+                ", beschreibung='" + beschreibung + '\'' +
+                ", start=" + start +
+                ", ende=" + ende +
+                '}';
     }
 
     public void setEnde(Date ende) {
@@ -56,28 +77,5 @@ public class Sendung implements Serializable {
                 ", start=" + start +
                 ", ende=" + ende +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Sendung)) return false;
-
-        Sendung sendung = (Sendung) o;
-
-        if (getTitel() != null ? !getTitel().equals(sendung.getTitel()) : sendung.getTitel() != null) return false;
-        if (getBeschreibung() != null ? !getBeschreibung().equals(sendung.getBeschreibung()) : sendung.getBeschreibung() != null)
-            return false;
-        if (getStart() != null ? !getStart().equals(sendung.getStart()) : sendung.getStart() != null) return false;
-        return getEnde() != null ? getEnde().equals(sendung.getEnde()) : sendung.getEnde() == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getTitel() != null ? getTitel().hashCode() : 0;
-        result = 31 * result + (getBeschreibung() != null ? getBeschreibung().hashCode() : 0);
-        result = 31 * result + (getStart() != null ? getStart().hashCode() : 0);
-        result = 31 * result + (getEnde() != null ? getEnde().hashCode() : 0);
-        return result;
     }
 }
