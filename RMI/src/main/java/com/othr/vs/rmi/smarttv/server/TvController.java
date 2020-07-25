@@ -1,5 +1,6 @@
 package com.othr.vs.rmi.smarttv.server;
 
+import com.othr.vs.rmi.smarttv.client.CallbackIF;
 import com.othr.vs.rmi.smarttv.server.entity.Sendung;
 
 import java.rmi.AlreadyBoundException;
@@ -7,6 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 
 public class TvController implements TvControllerIF {
     private int aktuellerKanal = 1;
@@ -44,5 +46,17 @@ public class TvController implements TvControllerIF {
     public void wechsleKanal(int neuerKanal) throws RemoteException {
         System.out.println("TvController: Wechsel von Kanal " + aktuellerKanal + " auf " + neuerKanal);
         this.aktuellerKanal = neuerKanal;
+    }
+
+    @Override
+    public void aufnehmen(CallbackIF client) throws RemoteException {
+        System.out.println("Aufnehmen starten");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Aufnehmen beendet");
+        client.setAufnahmePfad("path-zum-video-" + new Random().nextInt(10));
     }
 }
