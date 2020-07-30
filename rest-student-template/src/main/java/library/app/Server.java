@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Server {
+    public static final String DATABASE = "jdbc:mysql://localhost:3306/vs-library";
+    public static final String USER = "root";
+    public static final String PASSWORD = "1234";
+
     public static void main(String[] args) throws IOException {
         ResourceConfig config = new ResourceConfig();
         config.register(BookService.class);

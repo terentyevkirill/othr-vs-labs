@@ -11,7 +11,7 @@ import java.util.Date;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Client {
     @XmlAttribute
-    private long clientId;
+    private int clientId;
     private String firstName;
     private String lastName;
     @XmlJavaTypeAdapter(DateAdapter.class)
@@ -21,7 +21,7 @@ public class Client {
     public Client() {
     }
 
-    public Client(long clientId, String firstName, String lastName, Date dateOfBirth, Address address) {
+    public Client(int clientId, String firstName, String lastName, Date dateOfBirth, Address address) {
         this.clientId = clientId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -29,8 +29,16 @@ public class Client {
         this.address = address;
     }
 
-    public long getClientId() {
+    public int getClientId() {
         return clientId;
+    }
+
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getFirstName() {

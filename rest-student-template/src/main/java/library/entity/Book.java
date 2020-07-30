@@ -29,6 +29,26 @@ public class Book {
         this.publicationDate = publicationDate;
     }
 
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setNumberOfPages(int numberOfPages) {
+        this.numberOfPages = numberOfPages;
+    }
+
+    public void setPublicationDate(Date publicationDate) {
+        this.publicationDate = publicationDate;
+    }
+
     public String getIsbn() {
         return isbn;
     }
