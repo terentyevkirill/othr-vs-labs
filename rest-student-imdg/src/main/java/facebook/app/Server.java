@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class Server {
 
-    public static final String DB_CONNECTION = "jdbc:mysql://localhost:3306/vs-facebook";
+    public static final String DB_CONNECTION = "jdbc:mysql://localhost:3306/vs-facebook?useLegacyDatetimeCode=false&serverTimezone=UTC";
     public static final String DB_USERNAME = "root";
     public static final String DB_PASSWORD = "1234";
     public static final String POSTS_MAP_NAME = "posts";
