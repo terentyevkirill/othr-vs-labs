@@ -1,17 +1,13 @@
 package facebook.service;
 
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.ReplicatedMap;
 import com.hazelcast.mapreduce.Job;
 import com.hazelcast.mapreduce.JobCompletableFuture;
 import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 import facebook.app.RestException;
 import facebook.entity.User;
-import facebook.mapreduce.FriendCollator;
-import facebook.mapreduce.FriendMapper;
-import facebook.mapreduce.FriendReducerFactory;
-import org.javatuples.Pair;
+import facebook.mapreduce.*;
 
 import javax.ws.rs.*;
 
@@ -33,7 +29,6 @@ public class FriendService {
     public Collection<User> getFriendsForUserId(@PathParam("id") int userId) {
         System.out.println("getFriendsForUserId: " + userId);
         IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
-//        MultiMap<User, Integer> friends = hazelcast.getMultiMap(FRIENDS_MULTIMAP_NAME);
         Set<User> friendSet = new HashSet<>();
         User user = userService.getUserById(userId);
         if (friends.containsKey(user)) {
@@ -57,8 +52,6 @@ public class FriendService {
                     friends.get(friend).add(userId);
 
                 friends.put(friend, new ArrayList<>());
-//                friends.put(user, friendId);
-//                friends.put(friend, userId);
                 friendSet.add(friend);
                 System.out.println("User with ID: " + friendId + " added to MultiMap as friend of user with ID: " + userId);
             }
@@ -74,7 +67,6 @@ public class FriendService {
     public Collection<User> addFriendToUser(@PathParam("user") int userId, @PathParam("friend") int friendId) {
         System.out.println("addFriendToUser: " + friendId + " to " + userId);
         IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
-//        MultiMap<User, Integer> friends = hazelcast.getMultiMap(FRIENDS_MULTIMAP_NAME);
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             c.setAutoCommit(false);
             // add friend to user's friends
@@ -96,8 +88,6 @@ public class FriendService {
                         friends.put(user, new ArrayList<>());
                     if (friends.containsKey(friend))
                         friends.get(friend).add(userId);
-//                    friends.put(user, friendId);
-//                    friends.put(friend, userId);
                     c.commit();
                     return friends.get(user).stream().map(userService::getUserById).collect(Collectors.toCollection(ArrayList::new));
                 } else {
@@ -119,7 +109,6 @@ public class FriendService {
     public Collection<User> removeFriendFromUser(@PathParam("user") int userId, @PathParam("friend") int friendId) {
         System.out.println("removeFriendFromUser: " + friendId + " from " + userId);
         IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
-//        MultiMap<User, Integer> friends = hazelcast.getMultiMap(FRIENDS_MULTIMAP_NAME);
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             c.setAutoCommit(false);
             // remove friend from user's friends
@@ -169,11 +158,17 @@ public class FriendService {
             while (rs.next()) {
                 User user = userService.getUserById(rs.getInt("user_id"));
                 int friendId = rs.getInt("friend_id");
+                System.out.println(user.getUserId() + " " + friendId);
                 if (!friends.containsKey(user))
                     friends.put(user, new ArrayList<>());
                 friends.get(user).add(friendId);
             }
 
+            System.out.println("Map: ");
+            friends.keySet().forEach(key -> {
+                System.out.println("Friends of " + key);
+                System.out.println(Arrays.toString(friends.get(key).toArray()));
+            });
             JobTracker jobTracker = hazelcast.getJobTracker("default");
 
             KeyValueSource<User, List<Integer>> source = KeyValueSource.fromMap(friends);
