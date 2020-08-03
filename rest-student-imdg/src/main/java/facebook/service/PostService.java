@@ -1,6 +1,6 @@
 package facebook.service;
 
-import com.hazelcast.core.ReplicatedMap;
+import com.hazelcast.core.IMap;
 import facebook.app.RestException;
 import facebook.entity.Post;
 
@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static facebook.app.Server.*;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -29,7 +28,7 @@ public class PostService {
     public Post getPostById(@PathParam("id") int postId) {
         System.out.println("getPostById: " + postId);
         Post post;
-        ReplicatedMap<Integer, Post> posts = hazelcast.getReplicatedMap(POSTS_MAP_NAME);
+        IMap<Integer, Post> posts = hazelcast.getMap(POSTS_MAP_NAME);
         post = posts.get(postId);
         if (post != null) {
             System.out.println(post + " taken from ReplicatedMap");
@@ -69,7 +68,7 @@ public class PostService {
     public Post addPost(Post post) {
         System.out.println("addPost: " + post);
         post.setPublishedAt(new Date());
-        ReplicatedMap<Integer, Post> posts = hazelcast.getReplicatedMap(POSTS_MAP_NAME);
+        IMap<Integer, Post> posts = hazelcast.getMap(POSTS_MAP_NAME);
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "INSERT INTO posts (author_id, text, published) VALUES (?, ?, ?)";
             PreparedStatement stmt = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -98,7 +97,7 @@ public class PostService {
     @Produces(APPLICATION_JSON)
     public Collection<Post> deletePostById(@PathParam("id") int postId) {
         System.out.println("deletePostById: " + postId);
-        ReplicatedMap<Integer, Post> posts = hazelcast.getReplicatedMap(POSTS_MAP_NAME);
+        IMap<Integer, Post> posts = hazelcast.getMap(POSTS_MAP_NAME);
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "DELETE FROM posts WHERE post_id = ?";
             PreparedStatement stmt = c.prepareStatement(query);
@@ -122,7 +121,7 @@ public class PostService {
     @Produces(APPLICATION_JSON)
     public Collection<Post> getAllPosts() {
         System.out.println("getAllPosts()");
-        ReplicatedMap<Integer, Post> posts = hazelcast.getReplicatedMap(POSTS_MAP_NAME);
+        IMap<Integer, Post> posts = hazelcast.getMap(POSTS_MAP_NAME);
         List<Post> postList = new ArrayList<>();
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT * FROM posts";

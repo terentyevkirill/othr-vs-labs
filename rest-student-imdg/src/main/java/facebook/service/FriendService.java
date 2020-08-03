@@ -1,32 +1,40 @@
 package facebook.service;
 
-import com.hazelcast.core.MultiMap;
+import com.hazelcast.core.IMap;
+import com.hazelcast.mapreduce.Job;
+import com.hazelcast.mapreduce.JobCompletableFuture;
+import com.hazelcast.mapreduce.JobTracker;
+import com.hazelcast.mapreduce.KeyValueSource;
 import facebook.app.RestException;
+import facebook.entity.User;
+import facebook.mapreduce.*;
 
 import javax.ws.rs.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.*;
 import static facebook.app.Server.*;
 
 @Path("friends")
 public class FriendService {
+    private final UserService userService = new UserService();
 
     @GET
     @Path("/{id}")
     @Produces(APPLICATION_JSON)
-    public Collection<Integer> getFriendsForUserId(@PathParam("id") int userId) {
+    public Collection<User> getFriendsForUserId(@PathParam("id") int userId) {
         System.out.println("getFriendsForUserId: " + userId);
-        MultiMap<Integer, Integer> friends = hazelcast.getMultiMap(FRIENDS_MULTIMAP_NAME);
-        if (friends.containsKey(userId)) {
+        IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
+        Set<User> friendSet = new HashSet<>();
+        User user = userService.getUserById(userId);
+        if (friends.containsKey(user)) {
             System.out.println("Friends of user with ID: " + userId + " taken from MultiMap");
-            return friends.get(userId);
+            friendSet.addAll(friends.get(user).stream().map(userService::getUserById).collect(Collectors.toCollection(ArrayList::new)));
         }
-        List<Integer> friendList = new ArrayList<>();
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT friend_id FROM friends WHERE user_id = ?";
             PreparedStatement stmt = c.prepareStatement(query);
@@ -34,11 +42,20 @@ public class FriendService {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 int friendId = rs.getInt("friend_id");
-                friends.put(userId, friendId);
-                friendList.add(friendId);
+                User friend = userService.getUserById(friendId);
+
+                if (friends.containsKey(user))
+                    friends.get(user).add(friendId);
+                else
+                    friends.put(user, new ArrayList<>());
+                if (friends.containsKey(friend))
+                    friends.get(friend).add(userId);
+
+                friends.put(friend, new ArrayList<>());
+                friendSet.add(friend);
                 System.out.println("User with ID: " + friendId + " added to MultiMap as friend of user with ID: " + userId);
             }
-            return friendList;
+            return friendSet;
         } catch (SQLException e) {
             throw new RestException(500, e.getMessage());
         }
@@ -46,9 +63,10 @@ public class FriendService {
 
     @POST
     @Path("/{user}/{friend}")
-    public Collection<Integer> addFriendToUser(@PathParam("user") int userId, @PathParam("friend") int friendId) {
+    @Produces(APPLICATION_JSON)
+    public Collection<User> addFriendToUser(@PathParam("user") int userId, @PathParam("friend") int friendId) {
         System.out.println("addFriendToUser: " + friendId + " to " + userId);
-        MultiMap<Integer, Integer> friends = hazelcast.getMultiMap(FRIENDS_MULTIMAP_NAME);
+        IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             c.setAutoCommit(false);
             // add friend to user's friends
@@ -62,10 +80,16 @@ public class FriendService {
                 stmt2.setInt(1, friendId);
                 stmt2.setInt(2, userId);
                 if (stmt2.executeUpdate() == 1) {
-                    friends.put(userId, friendId);
-                    friends.put(friendId, userId);
+                    User user = userService.getUserById(userId);
+                    User friend = userService.getUserById(friendId);
+                    if (friends.containsKey(user))
+                        friends.get(user).add(friendId);
+                    else
+                        friends.put(user, new ArrayList<>());
+                    if (friends.containsKey(friend))
+                        friends.get(friend).add(userId);
                     c.commit();
-                    return friends.get(userId);
+                    return friends.get(user).stream().map(userService::getUserById).collect(Collectors.toCollection(ArrayList::new));
                 } else {
                     c.rollback();
                     throw new RestException(500, "Failed to add friend with ID: " + userId + " to " + friendId + "'s friends");
@@ -81,9 +105,10 @@ public class FriendService {
 
     @DELETE
     @Path("/{user}/{friend}")
-    public Collection<Integer> removeFriendFromUser(@PathParam("user") int userId, @PathParam("friend") int friendId) {
+    @Produces(APPLICATION_JSON)
+    public Collection<User> removeFriendFromUser(@PathParam("user") int userId, @PathParam("friend") int friendId) {
         System.out.println("removeFriendFromUser: " + friendId + " from " + userId);
-        MultiMap<Integer, Integer> friends = hazelcast.getMultiMap(FRIENDS_MULTIMAP_NAME);
+        IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
         try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
             c.setAutoCommit(false);
             // remove friend from user's friends
@@ -97,10 +122,14 @@ public class FriendService {
                 stmt2.setInt(1, friendId);
                 stmt2.setInt(2, userId);
                 if (stmt2.executeUpdate() == 1) {
-                    friends.remove(userId, friendId);
-                    friends.remove(friendId, userId);
+                    User user = userService.getUserById(userId);
+                    User friend = userService.getUserById(friendId);
+                    if (friends.containsKey(user))
+                        friends.get(user).remove(friendId);
+                    if (friends.containsKey(friend))
+                        friends.get(friend).remove(userId);
                     c.commit();
-                    return friends.get(userId);
+                    return friends.get(user).stream().map(userService::getUserById).collect(Collectors.toCollection(ArrayList::new));
                 } else {
                     c.rollback();
                     throw new RestException(500, "Failed to remove friend with ID: " + userId + " from " + friendId + "'s friends");
@@ -110,6 +139,50 @@ public class FriendService {
                 throw new RestException(500, "Failed to remove friend with ID: " + friendId + " from " + userId + "'s friends");
             }
         } catch (SQLException e) {
+            throw new RestException(500, e.getMessage());
+        }
+    }
+
+    @GET
+    @Path("/common")
+    @Produces(APPLICATION_JSON)
+    public Collection<Integer> getCommonFriends() {
+        System.out.println("getCommonFriends");
+        IMap<User, List<Integer>> friends = hazelcast.getMap(FRIENDS_MULTIMAP_NAME);
+
+        try (Connection c = DriverManager.getConnection(DB_CONNECTION, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT * FROM friends";
+            Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            friends.clear();
+            while (rs.next()) {
+                User user = userService.getUserById(rs.getInt("user_id"));
+                int friendId = rs.getInt("friend_id");
+                System.out.println(user.getUserId() + " " + friendId);
+                if (!friends.containsKey(user))
+                    friends.put(user, new ArrayList<>());
+                friends.get(user).add(friendId);
+            }
+
+            System.out.println("Map: ");
+            friends.keySet().forEach(key -> {
+                System.out.println("Friends of " + key);
+                System.out.println(Arrays.toString(friends.get(key).toArray()));
+            });
+            JobTracker jobTracker = hazelcast.getJobTracker("default");
+
+            KeyValueSource<User, List<Integer>> source = KeyValueSource.fromMap(friends);
+
+            Job<User, List<Integer>> job = jobTracker.newJob(source);
+
+            JobCompletableFuture<List<Integer>> jobCompletableFuture = job
+                    .mapper(new FriendMapper())
+                    .reducer(new FriendReducerFactory())
+                    .submit(new FriendCollator());
+
+            return jobCompletableFuture.get();
+
+        } catch (InterruptedException | ExecutionException | SQLException e) {
             throw new RestException(500, e.getMessage());
         }
     }

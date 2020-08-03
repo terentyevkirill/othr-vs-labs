@@ -13,7 +13,7 @@ public class TippReducerFactory implements ReducerFactory<String, Veranstaltung,
         return new TippReducer();
     }
 
-    private class TippReducer extends Reducer<Veranstaltung, List<Veranstaltung>> {
+    private static class TippReducer extends Reducer<Veranstaltung, List<Veranstaltung>> {
         private volatile List<Veranstaltung> sammler = new ArrayList<>();
 
         @Override

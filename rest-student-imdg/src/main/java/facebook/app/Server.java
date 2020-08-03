@@ -10,6 +10,7 @@ import com.sun.net.httpserver.HttpServer;
 import facebook.service.FriendService;
 import facebook.service.PostService;
 import facebook.service.UserService;
+import facebook.service.WordsService;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.swing.*;
@@ -20,12 +21,13 @@ import java.util.Arrays;
 
 public class Server {
 
-    public static final String DB_CONNECTION = "jdbc:mysql://localhost:3306/vs-facebook";
+    public static final String DB_CONNECTION = "jdbc:mysql://localhost:3306/vs-facebook?useLegacyDatetimeCode=false&serverTimezone=UTC";
     public static final String DB_USERNAME = "root";
     public static final String DB_PASSWORD = "1234";
     public static final String POSTS_MAP_NAME = "posts";
     public static final String USERS_MAP_NAME = "users";
     public static final String FRIENDS_MULTIMAP_NAME = "friends";
+    public static final String WORDS_LIST_NAME = "words";
 
     public static HazelcastInstance hazelcast;
 
@@ -54,6 +56,7 @@ public class Server {
         restWebserverConfig.register(UserService.class);
         restWebserverConfig.register(PostService.class);
         restWebserverConfig.register(FriendService.class);
+        restWebserverConfig.register(WordsService.class);
 
         // W E B S E R V E R   ( P O R T  +  C O N T E X T - P F A D )
         // Create webserver instance and start it
