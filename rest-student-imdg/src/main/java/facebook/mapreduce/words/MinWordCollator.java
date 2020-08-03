@@ -1,7 +1,6 @@
 package facebook.mapreduce.words;
 
 import com.hazelcast.mapreduce.Collator;
-import org.javatuples.Pair;
 
 import java.util.Comparator;
 import java.util.Map;
