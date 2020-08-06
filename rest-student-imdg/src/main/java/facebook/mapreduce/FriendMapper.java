@@ -2,17 +2,15 @@ package facebook.mapreduce;
 
 import com.hazelcast.mapreduce.Context;
 import com.hazelcast.mapreduce.Mapper;
-import facebook.entity.User;
 import org.javatuples.Pair;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
-public class FriendMapper implements Mapper<User, List<Integer>, Pair<Integer, Integer>, List<Integer>> {
+public class FriendMapper implements Mapper<Integer, Set<Integer>, Pair<Integer, Integer>, Set<Integer>> {
 
     @Override
-    public void map(User user, List<Integer> friends, Context<Pair<Integer, Integer>, List<Integer>> context) {
-//        int userId = user.getUserId();
-//        System.out.println("Mapper: " + userId);
-//        context.emit(userId, friends);
+    public void map(Integer keyIn, Set<Integer> valuesIn, Context<Pair<Integer, Integer>, Set<Integer>> context) {
+        valuesIn.forEach(valueIn -> context.emit(Pair.fromArray(Stream.of(keyIn, valueIn).sorted().toArray(Integer[]::new)), valuesIn));
     }
 }
