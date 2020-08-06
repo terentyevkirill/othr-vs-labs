@@ -1,8 +1,6 @@
 package com.othr.vs.rmi.kfz.server;
 
-import com.othr.vs.rmi.kfz.server.api.Auto;
-import com.othr.vs.rmi.kfz.server.api.Besitzer;
-import com.othr.vs.rmi.kfz.server.api.KFZAnmeldungIF;
+import com.othr.vs.rmi.kfz.server.api.*;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -12,6 +10,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 
 public class KFZAnmeldungServer implements KFZAnmeldungIF {
+    private int letzteBescheinigungsId = 1;
+
     public static void main(String[] args) {
         try {
             KFZAnmeldungIF server = new KFZAnmeldungServer();
@@ -25,15 +25,22 @@ public class KFZAnmeldungServer implements KFZAnmeldungIF {
     }
 
     @Override
-    public Auto anmelden(Besitzer besitzer, Auto auto) throws RemoteException {
-        System.out.println("KFZAnmeldungServer: anmelden " + auto + " für " + besitzer);
+    public BescheinigungIF anmelden(BesitzerIF besitzer, AutoIF auto) throws RemoteException {
+        System.out.println("KFZAnmeldungServer: anmelden " + auto.toPrint() + " für " + besitzer.toPrint());
         try {
             Thread.sleep(1000 + new Random().nextInt(3000));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        auto.setBesitzer(besitzer);
-        System.out.println("Angemeldet");
-        return auto;
+        Bescheinigung bescheinigung = new Bescheinigung(
+                letzteBescheinigungsId++,
+                besitzer.getSteuerId(),
+                auto.getKennzeichnen(),
+                "Fahrer sieht misstrauisch aus.",
+                "Max Mustermann"
+        );
+        System.out.println("Angemeldet: " + bescheinigung);
+        BescheinigungIF bescheinigungStub = (BescheinigungIF) UnicastRemoteObject.exportObject(bescheinigung, 0);
+        return bescheinigungStub;
     }
 }

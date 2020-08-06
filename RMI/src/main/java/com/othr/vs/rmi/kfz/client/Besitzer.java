@@ -1,14 +1,13 @@
-package com.othr.vs.rmi.kfz.server.api;
+package com.othr.vs.rmi.kfz.client;
 
-import java.io.Serializable;
+import com.othr.vs.rmi.kfz.server.api.BesitzerIF;
 
-public class Besitzer implements Serializable {
-    private String steuerId;
+import java.rmi.RemoteException;
+
+public class Besitzer implements BesitzerIF {
+    private final String steuerId;
     private String vorname;
     private String nachname;
-
-    public Besitzer() {
-    }
 
     public Besitzer(String steuerId, String vorname, String nachname) {
         this.steuerId = steuerId;
@@ -16,12 +15,16 @@ public class Besitzer implements Serializable {
         this.nachname = nachname;
     }
 
+    @Override
     public String getSteuerId() {
         return steuerId;
     }
 
-    public void setSteuerId(String steuerId) {
-        this.steuerId = steuerId;
+    @Override
+    public String toPrint() throws RemoteException {
+        return "Besitzer{" +
+                "steuerId='" + steuerId + '\'' +
+                '}';
     }
 
     public String getVorname() {

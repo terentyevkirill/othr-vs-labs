@@ -1,15 +1,13 @@
-package com.othr.vs.rmi.kfz.server.api;
+package com.othr.vs.rmi.kfz.client;
 
-import java.io.Serializable;
+import com.othr.vs.rmi.kfz.server.api.AutoIF;
 
-public class Auto implements Serializable {
-    private String kennzeichnen;
-    private String hersteller;
-    private String modell;
-    private Besitzer besitzer;
+import java.rmi.RemoteException;
 
-    public Auto() {
-    }
+public class Auto implements AutoIF {
+    private final String kennzeichnen;
+    private final String hersteller;
+    private final String modell;
 
     public Auto(String kennzeichnen, String hersteller, String modell) {
         this.kennzeichnen = kennzeichnen;
@@ -17,6 +15,7 @@ public class Auto implements Serializable {
         this.modell = modell;
     }
 
+    @Override
     public String getKennzeichnen() {
         return kennzeichnen;
     }
@@ -30,12 +29,11 @@ public class Auto implements Serializable {
         return modell;
     }
 
-    public Besitzer getBesitzer() {
-        return besitzer;
-    }
-
-    public void setBesitzer(Besitzer besitzer) {
-        this.besitzer = besitzer;
+    @Override
+    public String toPrint() throws RemoteException {
+        return "Auto{" +
+                "kennzeichnen='" + kennzeichnen + '\'' +
+                '}';
     }
 
     @Override
@@ -59,7 +57,6 @@ public class Auto implements Serializable {
                 "kennzeichnen='" + kennzeichnen + '\'' +
                 ", hersteller='" + hersteller + '\'' +
                 ", modell='" + modell + '\'' +
-                ", besitzer=" + besitzer +
                 '}';
     }
 }
