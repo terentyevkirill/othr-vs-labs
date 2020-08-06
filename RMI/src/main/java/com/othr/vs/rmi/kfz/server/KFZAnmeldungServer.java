@@ -25,7 +25,7 @@ public class KFZAnmeldungServer implements KFZAnmeldungIF {
     }
 
     @Override
-    public BescheinigungIF anmelden(BesitzerIF besitzer, AutoIF auto) throws RemoteException {
+    public void anmelden(BesitzerIF besitzer, AutoIF auto, CallbackIF referenz) throws RemoteException {
         System.out.println("KFZAnmeldungServer: anmelden " + auto.toPrint() + " für " + besitzer.toPrint());
         try {
             Thread.sleep(1000 + new Random().nextInt(3000));
@@ -41,6 +41,6 @@ public class KFZAnmeldungServer implements KFZAnmeldungIF {
         );
         System.out.println("Angemeldet: " + bescheinigung);
         BescheinigungIF bescheinigungStub = (BescheinigungIF) UnicastRemoteObject.exportObject(bescheinigung, 0);
-        return bescheinigungStub;
+        referenz.setBescheinigung(bescheinigungStub);
     }
 }

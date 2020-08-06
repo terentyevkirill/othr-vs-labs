@@ -8,7 +8,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class KFZAnmeldungClient {
+public class KFZAnmeldungClient implements CallbackIF {
     public static void main(String[] args) {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
@@ -19,11 +19,17 @@ public class KFZAnmeldungClient {
                 System.out.println("Anmelden " + auto + " für " + besitzer);
                 AutoIF autoStub = (AutoIF) UnicastRemoteObject.exportObject(auto, 0);
                 BesitzerIF besitzerStub = (BesitzerIF) UnicastRemoteObject.exportObject(besitzer, 0);
-                BescheinigungIF bescheinigung = serverStub.anmelden(besitzerStub, autoStub);
-                System.out.println("Angemeldet: " + bescheinigung.toPrint());
+                CallbackIF client = new KFZAnmeldungClient();
+                CallbackIF clientStub = (CallbackIF) UnicastRemoteObject.exportObject(client, 0);
+                serverStub.anmelden(besitzerStub, autoStub, clientStub);
             }
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setBescheinigung(BescheinigungIF bescheinigung) throws RemoteException {
+        System.out.println("Angemeldet: " + bescheinigung.toPrint());
     }
 }

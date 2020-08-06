@@ -4,5 +4,5 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface KFZAnmeldungIF extends Remote {
-    BescheinigungIF anmelden(BesitzerIF besitzer, AutoIF auto) throws RemoteException;
+    void anmelden(BesitzerIF besitzer, AutoIF auto, CallbackIF referenz) throws RemoteException;
 }
