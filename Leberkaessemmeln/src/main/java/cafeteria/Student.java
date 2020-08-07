@@ -13,7 +13,7 @@ public class Student implements Runnable {
         Random rnd = new Random();
         while(true) {
             try {
-                long eatingTime = 1000 + rnd.nextInt(4000);
+                long eatingTime = 2000 + rnd.nextInt(4000);
                 Thread.sleep(eatingTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
