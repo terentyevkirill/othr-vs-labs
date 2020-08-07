@@ -17,35 +17,37 @@ public class Theke {
     }
 
     public void liegen() {
-        lock.lock();
-        while (bunCounter == kapazitaet) {
-            try {
+        try {
+            lock.lock();
+            while (bunCounter == kapazitaet) {
                 System.out.println("Kellner warten auf liegen (bunCounter: " + bunCounter + ")");
                 kellner.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+            bunCounter++;
+            System.out.println("Leberkässemmel gelegt (bunCounter: " + bunCounter + ")");
+            studenten.signal(); 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
-        bunCounter++;
-        System.out.println("Leberkässemmel gelegt (bunCounter: " + bunCounter + ")");
-        studenten.signal();
-        lock.unlock();
     }
 
     public void nehmen() {
-        lock.lock();
-        while (bunCounter == 0) {
-            try {
+        try {
+            lock.lock();
+            while (bunCounter == 0) {
                 System.out.println("Studenten warten auf nehmen (bunCounter: " + bunCounter + ")");
                 studenten.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+            bunCounter--;
+            System.out.println("Leberkässemmel verkauft (bunCounter: " + bunCounter + ")");
+            kellner.signal();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
-        bunCounter--;
-        System.out.println("Leberkässemmel verkauft (bunCounter: " + bunCounter + ")");
-        kellner.signal();
-        lock.unlock();
     }
 
 }
